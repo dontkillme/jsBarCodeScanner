@@ -4,7 +4,9 @@ class ScannerEvent {
   domElem = null;
   shiftKeyCode = 16;
   endingKeyCodes = [9, 13];
-  scanTime = 200;
+  scanTime = 50;
+  timeBetweenChars = 12;
+  minChars = 5;
 
 
   register(domElem) {
@@ -21,33 +23,51 @@ class ScannerEvent {
   }
 
   scannerRead = (e) => {
+	let tmpTime = 0;
     if (e.keyCode == this.shiftKeyCode) {
       return;
     }
 
     if (this.endingKeyCodes.includes(e.keyCode)) {
       this.fireEvent();
-    } else {
-      this.buffor += e.key;
+    } else if (!e.altKey && !e.ctrlKey) {
+      this.buffor += String.fromCharCode(e.keyCode);
+	  tmpTime = this.end;
+	  this.end = new Date();
     }
-
+	
+	if (Math.ceil(tmpTime - this.end) < this.timeBetweenChars) {
+		clearInterval(this.readEndTimeout);
+		this.reading = false;
+	}
+	
     if (!this.reading) {
+	  this.end = new Date();
       this.reading = true;
-      setTimeout(this.fireEvent, this.scanTime);
+      this.readEndTimeout = setTimeout(this.fireEvent, this.scanTime);
     }   
   }
 
+  reset() {
+	this.buffor = "";
+	this.reading = false;
+  }
+
   fireEvent = () => {
+	if (this.buffor.length < this.minChars) {
+      this.reset();
+	  return;
+	}
+	
     const scanEvent = new CustomEvent("scanEnd", {
       detail: {
         value: this.buffor
       }
     });
     this.domElem.dispatchEvent(scanEvent);
-    this.buffor = "";
-    this.reading = false;
+    this.reset();
   }
 }
 
-//at this version class is added to window directly
+//Still adding this to main scope
 window.ScannerHandler = new ScannerEvent();
