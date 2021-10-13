@@ -1,5 +1,5 @@
-# jsBarCodeScanner
-Small js script adding barcode scanner support for websites;
+# jsScannerHandler
+Small js script adding barcode/qrcode scanner custom event emulation for websites;
 
 <b>How does it works</b>
 
@@ -7,7 +7,7 @@ Register DOM element which will react to keydown event.
 Best option is to use document.
 
 ```javascript
-ScannerHandler.register(document);
+new ScannerHandler.register(document);
 ```
 
 After that add event listener to document element on <b>scanEnd</b> event.

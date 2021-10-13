@@ -1,17 +1,62 @@
-class ScannerEvent {
-  buffor = "";
-  reading = false;
-  domElem = null;
-  shiftKeyCode = 16;
-  endingKeyCodes = [9, 13];
-  scanTime = 50;
-  timeBetweenChars = 12;
-  minChars = 5;
+'use strict'
 
+class ScannerEvent {
+  constructor() {  
+    this.buffor = "";
+    this.reading = false;
+    this.domElem = null;
+    this.shiftKeyCode = 16;
+    this.endingKeyCodes = [9, 13];
+    this.scanTime = 50;
+    this.timeBetweenChars = 12;
+    this.minChars = 5;
+    this.scannerRead = function(e) {
+      let tmpTime = 0;
+      if (e.keyCode == this.shiftKeyCode) {
+        return;
+      }
+
+      if (this.endingKeyCodes.includes(e.keyCode)) {
+        this.fireEvent();
+        clearInterval(this.readEndTimeout);
+        return;
+      } else if (!e.altKey && !e.ctrlKey) {
+        this.buffor += String.fromCharCode(e.keyCode);
+        tmpTime = this.end;
+        this.end = new Date();
+      }
+      
+      if (Math.ceil(tmpTime - this.end) < this.timeBetweenChars) {
+        clearInterval(this.readEndTimeout);
+        this.reading = false;
+      }
+      
+      if (!this.reading) {
+        this.end = new Date();
+        this.reading = true;
+        this.readEndTimeout = setTimeout(this.fireEvent.bind(this), this.scanTime);
+      }   
+    }
+      
+    this.fireEvent = function(e) {
+      if (this.buffor.length < this.minChars) {
+        this.reset();
+        return;
+      }
+      
+      const scanEvent = new CustomEvent("scanEnd", {
+        detail: {
+        value: this.buffor
+        }
+      });
+      this.domElem.dispatchEvent(scanEvent);
+      this.reset();
+    }
+  }
 
   register(domElem) {
     this.domElem = domElem;
-    domElem.addEventListener("keydown", this.scannerRead);
+    domElem.addEventListener("keydown", this.scannerRead.bind(this));
   }
 
   changeScanTime(scanTime) {
@@ -19,55 +64,13 @@ class ScannerEvent {
   }
 
   unregister() {
-    this.domElem.removeEventListener("keydown", this.scannerRead);
-  }
-
-  scannerRead = (e) => {
-	let tmpTime = 0;
-    if (e.keyCode == this.shiftKeyCode) {
-      return;
-    }
-
-    if (this.endingKeyCodes.includes(e.keyCode)) {
-      this.fireEvent();
-    } else if (!e.altKey && !e.ctrlKey) {
-      this.buffor += String.fromCharCode(e.keyCode);
-	  tmpTime = this.end;
-	  this.end = new Date();
-    }
-	
-	if (Math.ceil(tmpTime - this.end) < this.timeBetweenChars) {
-		clearInterval(this.readEndTimeout);
-		this.reading = false;
-	}
-	
-    if (!this.reading) {
-	  this.end = new Date();
-      this.reading = true;
-      this.readEndTimeout = setTimeout(this.fireEvent, this.scanTime);
-    }   
+    this.domElem.removeEventListener("keydown", this.scannerRead.bind(this));
   }
 
   reset() {
 	this.buffor = "";
 	this.reading = false;
   }
-
-  fireEvent = () => {
-	if (this.buffor.length < this.minChars) {
-      this.reset();
-	  return;
-	}
-	
-    const scanEvent = new CustomEvent("scanEnd", {
-      detail: {
-        value: this.buffor
-      }
-    });
-    this.domElem.dispatchEvent(scanEvent);
-    this.reset();
-  }
 }
 
-//Still adding this to main scope
-window.ScannerHandler = new ScannerEvent();
+module.exports = ScannerEvent;
