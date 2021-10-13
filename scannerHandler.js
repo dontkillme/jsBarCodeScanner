@@ -1,7 +1,7 @@
 'use strict'
 
 class ScannerEvent {
-  constructor() {  
+  constructor(noDefault = true) {  
     this.buffor = "";
     this.reading = false;
     this.domElem = null;
@@ -10,7 +10,14 @@ class ScannerEvent {
     this.scanTime = 50;
     this.timeBetweenChars = 12;
     this.minChars = 5;
+    this.noDefault = noDefault;
     this.scannerRead = function(e) {
+      e.stopPropagation();
+      
+      if (this.noDefault) {
+        e.preventDefault();
+      }
+      
       let tmpTime = 0;
       if (e.keyCode == this.shiftKeyCode) {
         return;
