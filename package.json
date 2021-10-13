@@ -17,7 +17,7 @@
 	  "scanner"
   ],
   "author": "D0ntKillMe",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/dontkillme/jsBarCodeScanner/issues"
   },
