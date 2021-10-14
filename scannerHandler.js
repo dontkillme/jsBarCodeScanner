@@ -28,7 +28,7 @@ class ScannerEvent {
         clearInterval(this.readEndTimeout);
         return;
       } else if (!e.altKey && !e.ctrlKey) {
-        this.buffor += String.fromCharCode(e.keyCode);
+        this.buffor += e.key; 
         tmpTime = this.end;
         this.end = new Date();
       }
@@ -63,7 +63,7 @@ class ScannerEvent {
 
   register(domElem) {
     this.domElem = domElem;
-    domElem.addEventListener("keydown", this.scannerRead.bind(this));
+    domElem.addEventListener("keypress", this.scannerRead.bind(this));
   }
 
   changeScanTime(scanTime) {
@@ -71,12 +71,12 @@ class ScannerEvent {
   }
 
   unregister() {
-    this.domElem.removeEventListener("keydown", this.scannerRead.bind(this));
+    this.domElem.removeEventListener("keypress", this.scannerRead.bind(this));
   }
 
   reset() {
-	this.buffor = "";
-	this.reading = false;
+	  this.buffor = "";
+	  this.reading = false;
   }
 }
 

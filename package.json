@@ -1,6 +1,6 @@
 {
-  "name": "jsScannerHandler",
-  "version": "0.1.1",
+  "name": "js-scanner-handler",
+  "version": "0.1.2",
   "description": "Simple wrapper for barcode and qr code readers HID that will fire custom event if input from scanner is detected. Detection at this point is based on time between next input characters.",
   "main": "scannerHandler.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "reader",
 	  "scanner"
   ],
-  "author": "D0ntKillMe",
+  "author": "samlis",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dontkillme/jsBarCodeScanner/issues"
